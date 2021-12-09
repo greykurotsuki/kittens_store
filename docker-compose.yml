@@ -13,10 +13,12 @@ services:
       - 8080:8080
 
   web:
-    build: .
+    image: yuralagoyda/kittens-test
     environment:
       - POSTGRES_PASSWORD=sunshine
+      - POSTGRES_USER=kurtsuki
+      - RAKE_ENV=test
     ports:
-      - "1234:1234"
+      - 80:80
     depends_on:
       - database
