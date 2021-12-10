@@ -47,7 +47,16 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/simplewhale:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/kittens-test:latest
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
+        
+      - name: Run docker compose
+        run: docker-compose up 
+        
+      - name: Create/migrate/seed for Postgresql
+        run: docker-compose run web bundle exec rake db:create db:migrate db:seed
+        
+      - name: Run auto-test
+        run: docker-compose run web bundle exec rspec
