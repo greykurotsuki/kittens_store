@@ -61,6 +61,59 @@ jobs:
       - name: Run auto-test
         run: docker-compose run web bundle exec rspec
         
+  deploy:
+    name: CD Pipeline
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['12.x']
+        appname: ['codedeploy-main']
+        deploy-group: ['main']
+        s3-bucket: ['aws-codedeploy-deploy']
+        s3-filename: ['aws-codedeploy-${{ github.sha }}']
+        region: ['us-west-3']
+    needs: build
+    steps:
+      - uses: actions/checkout@v2
+
+      # Initialize Node.js
+      - name: Install Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # Install project dependencies and build
+      - name: Install dependencies
+        run: npm install
+      - name: Run build
+        run: npm run build
+
+      # Install AWS CLI 2
+     # - name: Install AWS CLI 2
+      #  run: |
+       #   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+        #  unzip awscliv2.zip
+         # sudo ./aws/install
+      # Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.MY_AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.MY_AWS_SECRET_KEY }}
+          aws-region: ${{ matrix.region }}
+
+
+
+
+
+
+
+
+
+
+
+
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
