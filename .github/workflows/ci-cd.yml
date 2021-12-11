@@ -72,7 +72,7 @@ jobs:
         deploy-group: ['main']
         s3-bucket: ['aws-codedeploy-deploy']
         s3-filename: ['aws-codedeploy-${{ github.sha }}']
-        region: ['us-west-3']
+        region: ['eu-west-3']
     needs: build
     
     steps:
