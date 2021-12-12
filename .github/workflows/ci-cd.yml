@@ -80,11 +80,6 @@ jobs:
     
     steps:
      - uses: actions/checkout@v2
-     - uses: ruby/setup-ruby@v1
-       with:
-         ruby-version: 2.4.9 
-         bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-     - run: ls -l
           
       # Configure AWS credentials
      - name: Configure AWS credentials
@@ -94,35 +89,19 @@ jobs:
          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
          aws-region: ${{ matrix.region }}
 
-     - name: Login to Amazon ECR
-       id: login-ecr
-       uses: aws-actions/amazon-ecr-login@v1
-     
-     - name: Build, tag, and push image to Amazon ECR
-       env:
-         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-         ECR_REPOSITORY: yuralagoyda	
-         IMAGE_TAG: kittens_store
+     - name: HashiCorp - Setup Terraform
+       uses: hashicorp/setup-terraform@v1.2.1
+       
+     - name: Initialine backend(for terraform in AWS) using Terraform #We do it to store .tfstate files in S3 bucket
        run: |
-         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-     
-     # Deploy push to AWS S3
-     - name: AWS Deploy push
+        cd ./terraform/backend
+        terraform init
+        terraform apply --auto-approve
+        
+     - name: Create EC2 instance for manual testing of Kittens-store
        run: |
-          aws deploy push \
-          --application-name ${{ matrix.appname }} \
-          --description "This is a revision for the ${{ matrix.appname }}-${{ github.sha }}" \
-          --ignore-hidden-files \
-          --s3-location s3://${{ matrix.s3-bucket }}/${{ matrix.s3-filename }}.zip \
-          --source .
+        cd ../eu-west-3/
+        terraform init
+        terraform apply --auto-approve
      
-     # Create deployment to CodeDeploy
-     - name: AWS Create Deployment to CodeDeploy
-       run: |
-          aws deploy create-deployment \
-           --application-name ${{ matrix.appname }} \
-           --deployment-config-name CodeDeployDefault.OneAtATime \
-           --deployment-group-name ${{ matrix.deploy-group }} \
-           --file-exists-behavior OVERWRITE \
-           --s3-location bucket=${{ matrix.s3-bucket }},key=${{ matrix.s3-filename }}.zip,bundleType=zip \
+
