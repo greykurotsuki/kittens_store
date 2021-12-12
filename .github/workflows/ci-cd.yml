@@ -100,7 +100,7 @@ jobs:
         
      - name: Create EC2 instance for manual testing of Kittens-store
        run: |
-        cd ../eu-west-3/
+        cd ./terraform/eu-west-3
         terraform init
         terraform apply --auto-approve
      
