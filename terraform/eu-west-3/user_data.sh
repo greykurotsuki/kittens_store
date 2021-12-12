@@ -15,5 +15,6 @@ echo \
 sudo apt-get update -y
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io 
 
-sudo docker run -p 1234:1234 --stop-timeout 300 yuralagoyda/kittens-store:latest
-#--stop-timeout 172800
+sudo docker run -d -p 1234:1234 yuralagoyda/kittens-store:latest
+sleep 172800
+shutdown now
