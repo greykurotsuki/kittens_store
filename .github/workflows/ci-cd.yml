@@ -61,8 +61,8 @@ jobs:
       - name: Run auto-test
         run: docker-compose run web bundle exec rspec
       
-      - name: Setup Terraform
-      - uses: hashicorp/setup-terraform@v1
+#       - name: Setup Terraform
+#       - uses: hashicorp/setup-terraform@v1
         
   deploy:
     name: deploy
