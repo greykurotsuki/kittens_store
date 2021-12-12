@@ -98,7 +98,6 @@ jobs:
        id: login-ecr
        uses: aws-actions/amazon-ecr-login@v1
      
-     
      - name: Build, tag, and push image to Amazon ECR
        env:
          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -107,7 +106,6 @@ jobs:
        run: |
          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-     
      
      
      # Deploy push to AWS S3
@@ -120,7 +118,7 @@ jobs:
           --s3-location s3://${{ matrix.s3-bucket }}/${{ matrix.s3-filename }}.zip \
           --source .
       # Create deployment to CodeDeploy
-     - name: AWS Create Deployment
+     - name: AWS Create Deployment to CodeDeploy
        run: |
           aws deploy create-deployment \
            --application-name ${{ matrix.appname }} \
