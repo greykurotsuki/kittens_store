@@ -16,7 +16,7 @@ terraform {
 }
 
 provider "aws" {
-  region                  = var.aws_region
+  region = var.aws_region
 }
 
 #############################################
@@ -27,32 +27,17 @@ resource "aws_instance" "web-server" {
   instance_type           = "t2.micro"
   vpc_security_group_ids  = [aws_security_group.webserver_security.id]
   iam_instance_profile    = "CodeDeployInstanceRole"
-  tags                    = { name = "CodeDeploy-main", env = "main" }
+  tags                    = { Name = "Test Build"}
   user_data               = file("user_data.sh")
+  
+  timeouts {
+    delete = "2h"
+  }
 
   depends_on = [
     aws_security_group.webserver_security
   ]
 }
-
-# resource "aws_ec2_tag" "name" {
-#   resource_id = aws_instance.web-server.id
-#   key         = "name"
-#   value       = "CodeDeploy-main"
-
-#   depends_on  = [
-#     aws_instance.web-server
-#   ]
-# }
-
-# resource "aws_ec2_tag" "env" {
-#   resource_id = aws_instance.web-server.id
-#   key         = "env"
-#   value       = "main"
-#   depends_on  = [
-#     aws_instance.web-server
-#   ]
-# }
 
 #############################################
 #             Security Group
