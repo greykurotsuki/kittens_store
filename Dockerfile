@@ -18,5 +18,4 @@ ENV RACK_ENV=test
 # Install Dependencies 
 RUN bundle install
 
-EXPOSE 1234
 CMD [ "bundle", "exec", "rackup", "--port", "1234", "--host", "0.0.0.0" ]
