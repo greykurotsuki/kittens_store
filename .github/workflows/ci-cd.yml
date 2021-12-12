@@ -102,11 +102,10 @@ jobs:
        env:
          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
          ECR_REPOSITORY: yuralagoyda/kittens_store	
-         IMAGE_TAG: nodejs_demo_image
+         IMAGE_TAG: some_kittens
        run: |
          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-     
      
      # Deploy push to AWS S3
      - name: AWS Deploy push
@@ -117,7 +116,8 @@ jobs:
           --ignore-hidden-files \
           --s3-location s3://${{ matrix.s3-bucket }}/${{ matrix.s3-filename }}.zip \
           --source .
-      # Create deployment to CodeDeploy
+     
+     # Create deployment to CodeDeploy
      - name: AWS Create Deployment to CodeDeploy
        run: |
           aws deploy create-deployment \
@@ -126,11 +126,3 @@ jobs:
            --deployment-group-name ${{ matrix.deploy-group }} \
            --file-exists-behavior OVERWRITE \
            --s3-location bucket=${{ matrix.s3-bucket }},key=${{ matrix.s3-filename }}.zip,bundleType=zip \
-#       - name: Build, tag, and push image to Amazon ECR
-#         env:
-#           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-#           ECR_REPOSITORY: docker_nodejs_demo
-#           IMAGE_TAG: nodejs_demo_image
-#         run: |
-#           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-#           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
