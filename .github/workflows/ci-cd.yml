@@ -19,13 +19,6 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    
-    #Define environment variable for ruby version
-    strategy:
-      matrix:
-        ruby-version: ['2.4.9']
-        
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Check Out Repo 
         uses: actions/checkout@v2
@@ -60,22 +53,10 @@ jobs:
         
       - name: Run auto-test
         run: docker-compose run web bundle exec rspec
-      
-#       - name: Setup Terraform
-#       - uses: hashicorp/setup-terraform@v1
         
   deploy:
     name: deploy
     runs-on: ubuntu-latest
-    
-    strategy:
-      matrix:
-        node-version: ['12.x']
-        appname: ['codedeploy-main']
-        deploy-group: ['main']
-        s3-bucket: ['aws-codedeploy-deploy']
-        s3-filename: ['aws-codedeploy-${{ github.sha }}']
-        region: ['eu-west-3']
     needs: build
     
     steps:
@@ -89,10 +70,10 @@ jobs:
          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
          aws-region: ${{ matrix.region }}
 
-     - name: HashiCorp - Setup Terraform
+     - name: Setup Terraform
        uses: hashicorp/setup-terraform@v1.2.1
        
-     - name: Initialine backend(for terraform in AWS) using Terraform #We do it to store .tfstate files in S3 bucket
+     - name: Initialine backend (for terraform in AWS) #We do it to store .tfstate files in S3 bucket
        run: |
         cd ./terraform/backend
         terraform init
@@ -102,6 +83,5 @@ jobs:
        run: |
         cd ./terraform/eu-west-3
         terraform init
+        terraform destroy --auto-approve
         terraform apply --auto-approve
-     
-
